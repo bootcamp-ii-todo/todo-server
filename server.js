@@ -6,7 +6,7 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-// Create Expresss App
+// Create Express App
 
 // Required Dependencies
 const express = require('express');
