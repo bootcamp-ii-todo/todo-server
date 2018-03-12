@@ -1,0 +1,18 @@
+[
+    {
+        "task": "Write database load scripts",
+        "completed": false
+    },
+    {
+        "task": "Setup server with routes",
+        "completed": false
+    },
+    {
+        "task": "Deploy server to heroku",
+        "completed": false
+    },
+    {
+        "task": "Deploy client to github pages",
+        "completed": false
+    }
+]

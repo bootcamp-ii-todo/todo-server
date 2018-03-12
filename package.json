@@ -1,0 +1,37 @@
+{
+  "name": "todo-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "recreate-tables": "npm run drop-tables && npm run create-tables",
+    "create-tables": "node load-db/create-tables.js",
+    "drop-tables": "node load-db/drop-tables.js",
+    "seed-data": "node load-db/seed-data.js",
+    "db-load-all": "npm run recreate-tables && npm run seed-data",
+    "start": "node server.js",
+    "watch": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bootcamp-ii-todo/todo-server.git"
+  },
+  "author": "Marty Nelson <marty@martypdx.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bootcamp-ii-todo/todo-server/issues"
+  },
+  "homepage": "https://github.com/bootcamp-ii-todo/todo-server#readme",
+  "devDependencies": {
+    "eslint": "^4.18.2",
+    "nodemon": "^1.17.1"
+  },
+  "dependencies": {
+    "cors": "^2.8.4",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "pg": "^7.4.1"
+  }
+}
