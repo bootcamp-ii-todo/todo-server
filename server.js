@@ -55,6 +55,25 @@ app.post('/api/todos', (request, response) => {
         });
 });
 
+app.put('/api/todos/:id', (request, response) => {
+    const body = request.body;
+
+    client.query(`
+        UPDATE todos
+        SET task=$1,
+            completed=$2
+        WHERE id=$3
+        RETURNING id, task, completed;
+    `,
+    [body.task, body.completed, body.id]
+    )
+        .then(result => response.send(result.rows[0]))
+        .catch(err => {
+            console.log(err);
+            response.sendStatus(500);
+        });
+});
+
 app.listen(PORT, () => {
     console.log('Server running on port', PORT);
 });
