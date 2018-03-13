@@ -48,7 +48,10 @@ app.get('/api/todos/:id', (request, response) => {
     `,
     [id]
     )
-        .then(result => response.send(result.rows[0]))
+        .then(result => {
+            if(result.rows.length === 0) response.sendStatus(404);
+            else response.send(result.rows[0]);
+        })
         .catch(err => {
             console.log(err);
             response.sendStatus(500);
