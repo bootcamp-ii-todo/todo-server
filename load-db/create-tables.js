@@ -7,7 +7,7 @@ client.query(`
         id SERIAL PRIMARY KEY,
         task VARCHAR(256),
         completed BOOL NOT NULL DEFAULT FALSE,
-        priority INTEGER NOT NULL DEFAULT 5,
+        priority INTEGER DEFAULT 3,
         notes TEXT
     );
 `)
