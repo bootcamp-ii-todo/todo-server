@@ -1,18 +1,25 @@
 [
     {
         "task": "Write database load scripts",
-        "completed": false
+        "completed": false,
+        "priority": 3,
+        "notes": "Need to fitzle the wind ding"
     },
     {
         "task": "Setup server with routes",
-        "completed": false
+        "completed": false,
+        "priority": 3
     },
     {
         "task": "Deploy server to heroku",
-        "completed": false
+        "completed": false,
+        "priority": 3,
+        "notes": "Get free credit"
     },
     {
         "task": "Deploy client to github pages",
-        "completed": false
+        "completed": false,
+        "priority": 3,
+        "notes": "gh-pages ftw"
     }
 ]

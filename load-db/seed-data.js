@@ -5,11 +5,11 @@ const todos = require('./todos.json');
 
 Promise.all(todos.map(todo => {
     return client.query(`
-        INSERT INTO todos (task, completed)
-        VALUES ($1, $2);
+        INSERT INTO todos (task, completed, priority, notes)
+        VALUES ($1, $2, $3, $4);
     `,
     [
-        todo.task, todo.completed
+        todo.task, todo.completed, todo.priority, todo.notes
     ]);
 }))
     .then(

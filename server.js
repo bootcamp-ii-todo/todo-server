@@ -38,15 +38,36 @@ app.get('/api/todos', (request, response) => {
         });
 });
 
+app.get('/api/todos/:id', (request, response) => {
+    const id = request.params.id;
+    
+    client.query(`
+        SELECT id, task, completed, priority, notes
+        FROM todos
+        WHERE id=$1;
+    `,
+    [id]
+    )
+        .then(result => response.send(result.rows[0]))
+        .catch(err => {
+            console.log(err);
+            response.sendStatus(500);
+        });
+});
+
 app.post('/api/todos', (request, response) => {
     const body = request.body;
 
     client.query(`
-        INSERT INTO todos (task)
-        VALUES ($1)
-        RETURNING id, task, completed;
+        INSERT INTO todos (task, priority, notes)
+        VALUES ($1, $2, $3)
+        RETURNING id, task, completed, priority, notes;
     `,
-    [body.task]
+    [
+        body.task,
+        body.priority,
+        body.notes
+    ]
     )
         .then(result => response.send(result.rows[0]))
         .catch(err => {
@@ -61,11 +82,19 @@ app.put('/api/todos/:id', (request, response) => {
     client.query(`
         UPDATE todos
         SET task=$1,
-            completed=$2
+            completed=$2,
+            priority=$3,
+            notes=$4
         WHERE id=$3
         RETURNING id, task, completed;
     `,
-    [body.task, body.completed, body.id]
+    [
+        body.task,
+        body.completed,
+        body.priority,
+        body.notes,
+        body.id
+    ]
     )
         .then(result => response.send(result.rows[0]))
         .catch(err => {
