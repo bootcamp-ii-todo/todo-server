@@ -40,7 +40,7 @@ function ensureAdmin(request, response, next) {
     else next();
 }
 
-app.get('/api/admin', ensureAdmin, (request, response) => {
+app.get('/api/admin', (request, response) => {
     ensureAdmin(request, response, err => {
         response.send({ admin: !err });
     });
@@ -90,7 +90,7 @@ app.post('/api/todos', (request, response, next) => {
         .catch(next);
 });
 
-app.put('/api/todos/:id', ensureAdmin, (request, response, next) => {
+app.put('/api/todos/:id', (request, response, next) => {
     const body = request.body;
 
     client.query(`
@@ -99,7 +99,7 @@ app.put('/api/todos/:id', ensureAdmin, (request, response, next) => {
             completed=$2,
             priority=$3,
             notes=$4
-        WHERE id=$3
+        WHERE id=$5
         RETURNING id, task, completed;
     `,
     [
@@ -115,7 +115,7 @@ app.put('/api/todos/:id', ensureAdmin, (request, response, next) => {
 });
 
 
-app.delete('/api/todos/:id', (request, response, next) => {
+app.delete('/api/todos/:id', ensureAdmin, (request, response, next) => {
     const id = request.params.id;
 
     client.query(`
