@@ -5,6 +5,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
+const ADMIN_PASSPHRASE = process.env.ADMIN_PASSPHRASE;
+const CLIENT_URL = process.env.CLIENT_URL;
 
 // Create Express App
 
@@ -26,19 +28,34 @@ app.use(express.urlencoded({ extended: true }));
 // Add Data Routes
 const client = require('./db-client');
 
-app.get('/api/todos', (request, response) => {
+function ensureAdmin(request, response, next) {
+    // got token?
+    const token = request.get('token') || request.query.token;
+    if(!token) next({ status: 401, message: 'No token found' });
+
+    // right token?
+    else if(token !== ADMIN_PASSPHRASE) next({ status: 403, message: 'Unauthorized' });
+    
+    // you can pass
+    else next();
+}
+
+app.get('/api/admin', ensureAdmin, (request, response) => {
+    ensureAdmin(request, response, err => {
+        response.send({ admin: !err });
+    });
+});
+
+app.get('/api/todos', (request, response, next) => {
     client.query(`
         SELECT id, task, completed
         FROM todos;
     `)
         .then(result => response.send(result.rows))
-        .catch(err => {
-            console.log(err);
-            response.sendStatus(500);
-        });
+        .catch(next);
 });
 
-app.get('/api/todos/:id', (request, response) => {
+app.get('/api/todos/:id', (request, response, next) => {
     const id = request.params.id;
     
     client.query(`
@@ -49,16 +66,13 @@ app.get('/api/todos/:id', (request, response) => {
     [id]
     )
         .then(result => {
-            if(result.rows.length === 0) response.sendStatus(404);
+            if(result.rows.length === 0) next({ status: 404, message: `Todo id ${id} does not exist`});
             else response.send(result.rows[0]);
         })
-        .catch(err => {
-            console.log(err);
-            response.sendStatus(500);
-        });
+        .catch(next);
 });
 
-app.post('/api/todos', (request, response) => {
+app.post('/api/todos', (request, response, next) => {
     const body = request.body;
 
     client.query(`
@@ -73,13 +87,10 @@ app.post('/api/todos', (request, response) => {
     ]
     )
         .then(result => response.send(result.rows[0]))
-        .catch(err => {
-            console.log(err);
-            response.sendStatus(500);
-        });
+        .catch(next);
 });
 
-app.put('/api/todos/:id', (request, response) => {
+app.put('/api/todos/:id', ensureAdmin, (request, response, next) => {
     const body = request.body;
 
     client.query(`
@@ -100,10 +111,37 @@ app.put('/api/todos/:id', (request, response) => {
     ]
     )
         .then(result => response.send(result.rows[0]))
-        .catch(err => {
-            console.log(err);
-            response.sendStatus(500);
-        });
+        .catch(next);
+});
+
+
+app.delete('/api/todos/:id', (request, response, next) => {
+    const id = request.params.id;
+
+    client.query(`
+        DELETE FROM todos
+        WHERE id=$1;
+    `,
+    [id]
+    )
+        .then(result => response.send({ removed: result.rowCount !== 0 }))
+        .catch(next);
+});
+
+app.get('*', (request, response) => {
+    response.redirect(CLIENT_URL);
+});
+
+// eslint-disable-next-line
+app.use((err, request, response, next) => {
+    console.error(err);
+
+    if(err.status) {
+        response.status(err.status).send({ error: err.message });
+    }
+    else {
+        response.sendStatus(500);
+    }
 });
 
 app.listen(PORT, () => {
